@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Click Counter</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { font-size: 1.5em; padding: 10px 20px; }
+    #count { font-size: 2em; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Кликни и брои!</h1>
+  <button onclick="increment()">Кликни ме</button>
+  <div id="count">0</div>
+
+  <script>
+    let counter = 0;
+    function increment() {
+      counter++;
+      document.getElementById('count').textContent = counter;
+    }
+  </script>
+</body>
+</html>
