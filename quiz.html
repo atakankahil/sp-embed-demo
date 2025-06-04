@@ -4,55 +4,59 @@
   <meta charset="UTF-8" />
   <title>Квиз за обука</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
+    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; transition: all 0.3s ease; }
     .question { font-size: 1.3em; margin-bottom: 20px; }
-    .option { margin: 10px 0; display: block; }
-    button { margin-top: 20px; padding: 10px 20px; font-size: 1em; }
+    .option { margin: 10px 0; display: block; padding: 10px 20px; font-size: 1em; }
+    button { padding: 10px 20px; font-size: 1em; }
+    .progress-container { width: 80%; background: #eee; margin: 20px auto; border-radius: 5px; overflow: hidden; }
+    .progress-bar { height: 10px; background: green; width: 0%; transition: width 0.3s ease; }
+    #timer { font-weight: bold; color: #d63333; margin-top: 10px; }
   </style>
 </head>
 <body>
 
   <h1>🧠 Квиз за обука</h1>
+  <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
   <div id="quiz-container">
     <div class="question" id="question"></div>
     <div id="options"></div>
+    <div id="timer">⏳ 10</div>
     <button onclick="nextQuestion()">Следно прашање</button>
     <div id="result" style="margin-top: 20px;"></div>
   </div>
 
   <script>
     const quiz = [
-      {
-        q: "Која е главната функција на SharePoint?",
-        o: ["Играње игри", "Управување со документи", "Кодирање во Python"],
-        a: 1
-      },
-      {
-        q: "Која е кратенката за HTML?",
-        o: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language"],
-        a: 0
-      },
-      {
-        q: "Која е бојата на копчето за објавување во SharePoint?",
-        o: ["Сина", "Зелена", "Сива"],
-        a: 2
-      },
-      {
-        q: "Како се вика македонската валута?",
-        o: ["Лира", "Динар", "Фунта"],
-        a: 1
-      },
-      {
-        q: "JavaScript се извршува на:",
-        o: ["Сервер", "Браузер", "Принтер"],
-        a: 1
-      }
+      { q: "Која е главната функција на SharePoint?", o: ["Играње игри", "Управување со документи", "Кодирање во Python"], a: 1 },
+      { q: "Која е кратенката за HTML?", o: ["HyperText Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language"], a: 0 },
+      { q: "Која е бојата на копчето за објавување во SharePoint?", o: ["Сина", "Зелена", "Сива"], a: 2 },
+      { q: "Како се вика македонската валута?", o: ["Лира", "Динар", "Фунта"], a: 1 },
+      { q: "JavaScript се извршува на:", o: ["Сервер", "Браузер", "Принтер"], a: 1 }
     ];
 
-    let current = 0;
-    let score = 0;
+    let current = 0, score = 0, timer, timeLeft = 10;
+
+    function startTimer() {
+      clearInterval(timer);
+      timeLeft = 10;
+      document.getElementById('timer').textContent = `⏳ ${timeLeft}`;
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `⏳ ${timeLeft}`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          checkAnswer(null); // time out = incorrect
+        }
+      }, 1000);
+    }
+
+    function updateProgress() {
+      const progress = ((current) / quiz.length) * 100;
+      document.getElementById("progress").style.width = progress + "%";
+    }
 
     function showQuestion() {
+      updateProgress();
       const q = quiz[current];
       document.getElementById("question").textContent = q.q;
       const options = document.getElementById("options");
@@ -65,15 +69,18 @@
         options.appendChild(btn);
       });
       document.getElementById("result").textContent = "";
+      startTimer();
     }
 
     function checkAnswer(i) {
-      const isCorrect = i === quiz[current].a;
-      if (isCorrect) {
+      clearInterval(timer);
+      const correct = quiz[current].a;
+      const result = document.getElementById("result");
+      if (i === correct) {
         score++;
-        document.getElementById("result").textContent = "✅ Точно!";
+        result.textContent = "✅ Точно!";
       } else {
-        document.getElementById("result").textContent = "❌ Неточно!";
+        result.textContent = "❌ Неточно! Точен одговор: " + quiz[current].o[correct];
       }
       [...document.getElementsByClassName("option")].forEach(btn => btn.disabled = true);
     }
